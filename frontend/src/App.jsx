@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   getOptimalPath,
   loadGraph,
@@ -31,6 +31,11 @@ function App() {
 
   // Load graph and node list
   const [mapData, setMapData] = useState({ nodes: [], edges: [] });
+
+  // Memoize the filtered nodes to prevent unnecessary re-renders
+  const filteredNodes = useMemo(() => {
+    return mapData.nodes.filter(n => n.lat && n.lon);
+  }, [mapData.nodes]);
 
 const refreshGraph = async () => {
   const res = await fetch("http://localhost:5000/api/graph");
@@ -138,7 +143,7 @@ const refreshGraph = async () => {
         </div>
         {/* MapView */}
         <div className="w-1/2 h-[600px] relative overflow-hidden z-10 min-w-0">
-          <MapView nodes={mapData.nodes} />
+          <MapView nodes={filteredNodes} edges={mapData.edges}/>
         </div>
       </div>
       {/* Graph Section */}

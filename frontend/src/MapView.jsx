@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -8,66 +8,115 @@ export default function MapView({ nodes = [], edges = [] }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
-  // ✅ Initialize map only once
+  // Setup once
   useEffect(() => {
-    if (mapRef.current) return;
-
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: "mapbox://styles/mapbox/light-v11",
       center: [-98, 39],
-      zoom: 1.5,
-      projection: 'mercator',
+      zoom: 3,
+
     });
 
     mapRef.current = map;
 
-    map.on('load', () => {
-      // Initialize empty GeoJSON source
-      map.addSource('nodes', {
-        type: 'geojson',
+    map.on("load", () => {
+      // Build coordinate lookup
+      const nodeCoords = {};
+      nodes.forEach((n) => {
+        if (n.name && n.lat && n.lon) {
+          nodeCoords[n.name] = [Number(n.lon), Number(n.lat)];
+        }
+      });
+      console.log("✅ Node coordinates:", nodeCoords);
+
+      // === Nodes ===
+      const nodeFeatures = nodes.map((node) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [node.lon, node.lat]
+        },
+        properties: { ...node }
+      }));
+
+      map.addSource("nodes", {
+        type: "geojson",
         data: {
-          type: 'FeatureCollection',
-          features: []
+          type: "FeatureCollection",
+          features: nodeFeatures
         }
       });
 
       map.addLayer({
-        id: 'nodes-layer',
-        type: 'circle',
-        source: 'nodes',
+        id: "nodes-layer",
+        type: "circle",
+        source: "nodes",
         paint: {
-          'circle-radius': 6,
-          'circle-color': '#007cbf'
+          "circle-radius": 6,
+          "circle-color": "#007cbf"
         }
       });
-    });
-  }, []);
 
-  // ✅ Manually update node data when needed
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getSource('nodes')) return;
-
-    const geojson = {
-      type: 'FeatureCollection',
-      features: nodes.map(node => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [node.lon, node.lat],
+      map.addLayer({
+        id: "nodes-labels",
+        type: "symbol",
+        source: "nodes",
+        layout: {
+          "text-field": ["get", "name"],
+          "text-size": 12,
+          "text-offset": [0, 1.2],
+          "text-anchor": "top"
         },
-        properties: { ...node },
-      }))
-    };
+        paint: {
+          "text-color": "#333"
+        }
+      });
 
-    map.getSource('nodes').setData(geojson);
-  }, [nodes]);
+      // === Edges ===
+      const edgeFeatures = edges
+        .map((edge) => {
+          const from = nodeCoords[edge.source];
+          const to = nodeCoords[edge.target];
+          if (!from || !to) return null;
+
+          return {
+            type: "Feature",
+            geometry: {
+              type: "LineString",
+              coordinates: [from, to]
+            },
+            properties: { ...edge }
+          };
+        })
+        .filter(Boolean);
+
+      map.addSource("edges", {
+        type: "geojson",
+        data: {
+          type: "FeatureCollection",
+          features: edgeFeatures
+        }
+      });
+
+      map.addLayer({
+        id: "edges-layer",
+        type: "line",
+        source: "edges",
+        paint: {
+          "line-color": "#ff0000", // Bright red to test visibility
+          "line-width": 3
+        }
+      });
+
+      console.log("✅ Edge features:", edgeFeatures);
+    });
+  }, [nodes, edges]);
 
   return (
     <div
       ref={mapContainerRef}
-      style={{ width: '100%', height: '90vh' }}
+      style={{ width: "100%", height: "80vh" }}
       className="rounded shadow"
     />
   );
