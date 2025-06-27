@@ -8,7 +8,7 @@ class Neo4jHandler:
         self.driver.close()
 
     def get_graph(self):
-        query = "MATCH (n)-[r]->(m) RETURN n.name AS source, m.name AS target, r.distance AS distance, r.carbon AS carbon"
+        query = "MATCH (n)-[r]->(m) RETURN n.name AS source, m.name AS target, r.distance AS distance, r.carbon AS carbon, r.transport AS transport"
         with self.driver.session() as session:
             result = session.run(query)
             return [record.data() for record in result]

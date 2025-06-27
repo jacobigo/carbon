@@ -89,7 +89,7 @@ const refreshGraph = async () => {
   };
 
   return (
-    <div className="p-6 w-full mx-auto space-y-6">
+    <div style={{ maxWidth: "25000px", margin: "0 auto" }}>
       <h1 className="text-3xl font-bold text-blue-700">Supply Chain Optimizer</h1>
 
       {/* Pathfinding Form */}
@@ -137,13 +137,13 @@ const refreshGraph = async () => {
           </button>
         </div>
         {/* Path Result & Graph/Map Section */}
-      <div className="flex flex-row gap-3 w-full">
+      <div style={{ display: "flex", flexDirection: "row", gap: "1rem", width: "100%" }}>
         {/* GraphView */}
-        <div className="w-1/2 h-[600px] relative overflow-hidden z-10 min-w-0">
-          <GraphView elements={graphElements} path={path} />
+        <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden", zIndex: 10, minWidth: 0 }}>
+          <GraphView elements={graphElements} highlightedPath={path} />
         </div>
         {/* MapView */}
-        <div className="w-1/2 h-[600px] relative overflow-hidden z-10 min-w-0">
+        <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden", zIndex: 10, minWidth: 0 }}>
           <MapView nodes={filteredNodes} edges={mapData.edges}/>
         </div>
       </div>

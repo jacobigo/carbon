@@ -47,7 +47,8 @@ def get_graph():
             "target": edge["target"],
             "distance": edge["distance"],
             "carbon": edge["carbon"],
-            "transport": edge.get("transport")  # Add transport type if available
+            # Always provide a string for transport, defaulting to 'unknown' if missing or None
+            "transport": edge.get("transport") if edge.get("transport") else "unknown"
         })
 
     return jsonify({

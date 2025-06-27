@@ -99,6 +99,7 @@ export default function MapView({ nodes = [], edges = [] }) {
         }
       });
 
+      console.log("✅ Edge features:", edgeFeatures);
       map.addLayer({
         id: "edges-layer",
         type: "line",
