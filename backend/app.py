@@ -4,6 +4,7 @@ from flask_cors import CORS
 from neo4j_utils import Neo4jHandler
 from graph_logic import build_graph, find_path
 from math import radians, cos, sin, asin, sqrt
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +17,38 @@ EMISSION_FACTORS = {
     "train": 0.045,   # kg CO₂ per km (freight rail)
     "plane": 0.255    # kg CO₂ per km (average commercial flight)
 }
+
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    data = request.json
+    question = data.get("question", "")
+
+    # Fetch relevant data from Neo4j
+    with neo4j.driver.session() as session:
+        nodes = session.run("MATCH (n:Location) RETURN n.name AS name").values()
+        edges = session.run("MATCH (a:Location)-[r:ROUTE]->(b:Location) RETURN a.name, b.name, r.transport, r.distance, r.carbon").values()
+
+    # Format the data as context
+    context = f"Locations: {', '.join([n[0] for n in nodes])}\n"
+    context += "Routes:\n"
+    for edge in edges:
+        context += f"From {edge[0]} to {edge[1]} by {edge[2]}: {edge[3]:.2f}km, {edge[4]:.2f}g CO2\n"
+
+    # Combine context with user question
+    prompt = f"You are a supply chain assistant. Here is the current network:\n{context}\nUser question: {question}"
+
+    # Send to Ollama
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "llama3",
+            "prompt": prompt,
+            "stream": False,
+        }
+    )
+    answer = response.json().get("response", "")
+    return jsonify({"answer": answer})
 
 
 @app.route("/api/path", methods=["POST"])

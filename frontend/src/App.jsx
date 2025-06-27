@@ -11,6 +11,8 @@ import {
 import GraphView from "./GraphView";
 import MapView from "./MapView";
 import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS for styles
+import "./ChatBot"
+import Chatbot from "./ChatBot";
 
 function App() {
   const [start, setStart] = useState("");
@@ -46,7 +48,7 @@ const refreshGraph = async () => {
         id: `${e.source}->${e.target}`,
         source: e.source,
         target: e.target,
-        label: `${e.distance}km / ${e.carbon}g`,
+        label: `${Number(e.distance).toFixed(2)}km / ${Number(e.carbon).toFixed(2)}g`,
       },
     })),
   ];
@@ -145,6 +147,9 @@ const refreshGraph = async () => {
         {/* MapView */}
         <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden", zIndex: 10, minWidth: 0 }}>
           <MapView nodes={filteredNodes} edges={mapData.edges}/>
+        </div>
+        <div style={{ width: "100%", height: "600px", position: "relative", overflow: "hidden", zIndex: 10, minWidth: 0 }}>
+          <Chatbot/>
         </div>
       </div>
       {/* Graph Section */}

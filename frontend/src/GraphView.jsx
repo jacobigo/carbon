@@ -30,7 +30,10 @@ export default function GraphView({ elements, highlightedPath = [] }) {
             "target-arrow-color": "#9ca3af",
             "target-arrow-shape": "triangle",
             label: "data(label)",
-            "font-size": 10,
+            color: "#fff", // Set edge label text to white
+            "font-size": 18, // Make edge label text bigger
+            "text-outline-width": 4, // Add outline for visibility
+            "text-outline-color": "#222", // Dark outline for contrast
             "text-rotation": "autorotate",
             "curve-style": "bezier",
           },
