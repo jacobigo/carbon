@@ -6,7 +6,7 @@ export default function GraphView({ elements, highlightedPath = [] }) {
 
   useEffect(() => {
     if (!containerRef.current) return;
-
+    console.log("Initializing Cytoscape with elements:", elements);
     const cy = cytoscape({
       container: containerRef.current,
       elements: elements,
@@ -54,6 +54,7 @@ export default function GraphView({ elements, highlightedPath = [] }) {
 
     // Highlight selected path
     highlightedPath.forEach((nodeId, i) => {
+      console.log(`Highlighting node: ${nodeId}`);
       if (i < highlightedPath.length - 1) {
         const source = nodeId;
         const target = highlightedPath[i + 1];

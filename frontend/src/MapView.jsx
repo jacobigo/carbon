@@ -104,8 +104,16 @@ export default function MapView({ nodes = [], edges = [] }) {
         type: "line",
         source: "edges",
         paint: {
-          "line-color": "#ff0000", // Bright red to test visibility
-          "line-width": 3
+          "line-color": [
+          "match",
+          ["get", "transport"],
+          "car", "#1e90ff",      // blue
+          "truck", "#f59e42",    // orange
+          "train", "#22c55e",    // green
+          "plane", "#e11d48",    // red
+          "#888"                 // default gray
+        ],
+        "line-width": 3
         }
       });
 

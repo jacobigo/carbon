@@ -34,6 +34,7 @@ export async function getOptimalPath(start, end, metric = "distance") {
     end,
     metric
   });
+  console.log("Optimal path response:", res.data);
   return res.data;
 }
 
@@ -52,11 +53,11 @@ export async function addNode(name) {
   return await res.json();
 }
 
-export async function addEdge(source, target, distance, carbon) {
+export async function addEdge(source, target, transport) {
   const res = await fetch("http://localhost:5000/api/edge", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source, target, distance, carbon }),
+    body: JSON.stringify({ source, target, transport }),
   });
   return await res.json();
 }

@@ -25,8 +25,7 @@ function App() {
   const [edgeForm, setEdgeForm] = useState({
     source: "",
     target: "",
-    distance: "",
-    carbon: "",
+    transport: "",
   });
 
   // Load graph and node list
@@ -64,8 +63,10 @@ const refreshGraph = async () => {
 
   const handleSubmit = async () => {
     if (!start || !end) return;
+    console.log("Finding optimal path from", start, "to", end, "using metric:", metric);
     const result = await getOptimalPath(start, end, metric);
     if (Array.isArray(result.path)) {
+      console.log("Optimal path found:", result.path);
       setPath(result.path);
     } else {
       setPath([]);
@@ -80,10 +81,10 @@ const refreshGraph = async () => {
   };
 
   const handleAddEdge = async () => {
-    const { source, target, distance, carbon } = edgeForm;
-    if (!source || !target || !distance || !carbon) return;
-    await addEdge(source, target, Number(distance), Number(carbon));
-    setEdgeForm({ source: "", target: "", distance: "", carbon: "" });
+    const { source, target, transport } = edgeForm;
+    if (!source || !target || !transport) return;
+    await addEdge(source, target, transport);
+    setEdgeForm({ source: "", target: "", transport: "" });
     refreshGraph();
   };
 
@@ -219,25 +220,17 @@ const refreshGraph = async () => {
                 ))}
               </select>
 
-              <input
+              <select
                 className="border p-2"
-                type="number"
-                placeholder="Distance (km)"
-                value={edgeForm.distance}
-                onChange={(e) =>
-                  setEdgeForm({ ...edgeForm, distance: e.target.value })
-                }
-              />
-
-              <input
-                className="border p-2"
-                type="number"
-                placeholder="Carbon (g)"
-                value={edgeForm.carbon}
-                onChange={(e) =>
-                  setEdgeForm({ ...edgeForm, carbon: e.target.value })
-                }
-              />
+                value={edgeForm.transport}
+                onChange={(e) => setEdgeForm({ ...edgeForm, transport: e.target.value })}
+              >
+                  <option value="">Transport Type</option>
+                  <option value="car">Car</option>
+                  <option value="truck">Truck</option>
+                  <option value="train">Train</option>
+                  <option value="plane">Plane</option>
+              </select>
 
               <button
                 className="bg-green-600 text-white px-4 py-2 rounded"

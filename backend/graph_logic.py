@@ -12,6 +12,7 @@ def build_graph(edges):
 
 def find_path(G, start, end, metric="distance"):
     try:
+        print(f"Finding path from {start} to {end} using metric '{metric}'")
         return nx.dijkstra_path(G, start, end, weight=metric)
     except Exception as e:
         return {"error": str(e)}
