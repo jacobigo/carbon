@@ -10,6 +10,7 @@ import {
 } from "./api";
 import GraphView from "./GraphView";
 import MapView from "./MapView";
+import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS for styles
 
 function App() {
   const [start, setStart] = useState("");
@@ -49,6 +50,7 @@ const refreshGraph = async () => {
   setGraphElements(cytoscapeElements);
   setAllNodes(data.nodes.map((n) => n.name));
   setMapData({ nodes: data.nodes, edges: data.edges });
+  console.log("Graph data loaded:", data);
 };
 
   useEffect(() => {
@@ -81,59 +83,65 @@ const refreshGraph = async () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 w-full mx-auto space-y-6">
       <h1 className="text-3xl font-bold text-blue-700">Supply Chain Optimizer</h1>
 
       {/* Pathfinding Form */}
-      <div className="flex flex-col md:flex-row gap-3 items-center">
-        <select
-          className="border p-2"
-          value={start}
-          onChange={(e) => setStart(e.target.value)}
-        >
-          <option value="">Start Node</option>
-          {allNodes.map((node) => (
-            <option key={node} value={node}>
-              {node}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-row md:flex-row gap-3 items-center">
+          <select
+            className="border p-2"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+          >
+            <option value="">Start Node</option>
+            {allNodes.map((node) => (
+          <option key={node} value={node}>
+            {node}
+          </option>
+            ))}
+          </select>
 
-        <select
-          className="border p-2"
-          value={end}
-          onChange={(e) => setEnd(e.target.value)}
-        >
-          <option value="">End Node</option>
-          {allNodes.map((node) => (
-            <option key={node} value={node}>
-              {node}
-            </option>
-          ))}
-        </select>
+          <select
+            className="border p-2"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+          >
+            <option value="">End Node</option>
+            {allNodes.map((node) => (
+          <option key={node} value={node}>
+            {node}
+          </option>
+            ))}
+          </select>
 
-        <select
-          className="border p-2"
-          value={metric}
-          onChange={(e) => setMetric(e.target.value)}
-        >
-          <option value="distance">Distance</option>
-          <option value="carbon">Carbon</option>
-        </select>
+          <select
+            className="border p-2"
+            value={metric}
+            onChange={(e) => setMetric(e.target.value)}
+          >
+            <option value="distance">Distance</option>
+            <option value="carbon">Carbon</option>
+          </select>
 
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-          onClick={handleSubmit}
-        >
-          Find Optimal Path
-        </button>
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={handleSubmit}
+          >
+            Find Optimal Path
+          </button>
+        </div>
+        {/* Path Result & Graph/Map Section */}
+      <div className="flex flex-row gap-3 w-full">
+        {/* GraphView */}
+        <div className="w-1/2 h-[600px] relative overflow-hidden z-10 min-w-0">
+          <GraphView elements={graphElements} path={path} />
+        </div>
+        {/* MapView */}
+        <div className="w-1/2 h-[600px] relative overflow-hidden z-10 min-w-0">
+          <MapView nodes={mapData.nodes} />
+        </div>
       </div>
-
-      {/* Graph */}
-      <GraphView elements={graphElements} highlightedPath={path} />
-      <MapView nodes={mapData.nodes} edges={mapData.edges} />
-
-      {/* Add Node */}
+      {/* Graph Section */}
       <div className="mt-6 space-y-4">
         <h2 className="text-xl font-semibold">Edit Graph</h2>
 
