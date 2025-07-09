@@ -14,7 +14,7 @@ export default function MapView({ nodes = [], edges = [] }) {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
       center: [-98, 39],
-      zoom: 3,
+      zoom: 2.5,
 
     });
 

@@ -12,11 +12,23 @@ CORS(app)
 neo4j = Neo4jHandler("neo4j+s://2d42c7af.databases.neo4j.io", "neo4j", "rDA0Gv33sVOz0OJl0KnYD94JHGLMTZHUvCvyqBXxD-0")
 
 EMISSION_FACTORS = {
-    "car": 0.192,     # kg CO₂ per km (average passenger car)
-    "truck": 0.6,     # kg CO₂ per km (freight truck)
+    "car": 0.15,     # kg CO₂ per km (average passenger car)
+    "truck": 0.2,     # kg CO₂ per km (freight truck)
     "train": 0.045,   # kg CO₂ per km (freight rail)
-    "plane": 0.255    # kg CO₂ per km (average commercial flight)
+    "plane": 0.6    # kg CO₂ per km (average commercial flight)
 }
+
+
+
+@app.route("/api/clear", methods=["POST"])
+def clear_database():
+    try:
+        with neo4j.driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
+        return jsonify({"status": "success", "message": "Database cleared"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 
 @app.route("/api/chat", methods=["POST"])
@@ -42,7 +54,7 @@ def chat():
     response = requests.post(
         "http://localhost:11434/api/generate",
         json={
-            "model": "llama3",
+            "model": "llama3.2",
             "prompt": prompt,
             "stream": False,
         }

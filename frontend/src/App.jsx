@@ -243,6 +243,28 @@ const refreshGraph = async () => {
               >
                 Add Edge
               </button>
+
+              <button
+  className="bg-red-600 text-white px-4 py-2 rounded"
+  onClick={async () => {
+    if (window.confirm("Are you sure you want to clear the entire database?")) {
+      const res = await fetch("http://localhost:5000/api/clear", {
+        method: "POST"
+      });
+      const result = await res.json();
+      if (result.status === "success") {
+        alert("Database cleared");
+        refreshGraph();
+      } else {
+        alert("Error: " + result.message);
+      }
+    }
+  }}
+>
+  Clear Entire Database
+</button>
+
+
             </div>
           </div>
         </div>
